@@ -103,3 +103,141 @@ subplot(2,2,1); stem(n,real(x)); title('real part'); xlabel('n');
 subplot(2,2,2); stem(n,imag(x)); title('imaginary part');xlabel('n');
 subplot(2,2,3); stem(n,abs(x)); title('magnitude part');xlabel('n');
 subplot(2,2,4); stem(n,(180/pi)*angle(x)); title('phase part'); xlabel('n');
+
+%% convolução
+% help conv
+x = [3,11,7,0,-1,4,2];
+h = [2,3,0,-5,2,1];
+
+y = conv(x,h);
+plot(y, 'r')
+hold on
+
+nx = [-3:3];
+ny = [-1:4];
+
+[y, ny] = conv_m(x, nx, h, ny);
+plot(ny, y)
+
+%% Equção de diferenças EX: 2.11
+% a - coeficiente de amplitude de cada elemento.
+% b -  ganho de x[n]
+a = [1,-1,0.9];
+b = [1];
+
+
+n = [-20:100];
+h = impz(b,a,n);
+
+stem(n,h);
+title('Impulse response');
+xlabel('n');
+ylabel('h(n)');
+
+% plot é continuo
+plot(n,h)
+
+
+
+
+%% Matéria 2 - Reconstrução de sinais
+
+%% Exercício 3.20 - Usando Sinc
+% Discrete-time Signal x1(n)
+Ts = 0.0002;
+Fs = 1/Ts;
+n = -25:1:25;
+nTs = n*Ts;
+x = exp(-1000*abs(nTs));
+% Analog Signal reconstruction
+Dt = 0.00005;
+t = -0.005:Dt:0.005;
+xa = x * sinc(Fs*(ones(length(n),1)*t-nTs'*ones(1,length(t))));
+% check
+error = max(abs(xa - exp(-1000*abs(t))))
+%plot
+% plot(n*Ts*1000,x);
+plot(t*1000,xa,'b');
+hold on;
+stem(n*Ts*1000,x);
+xlabel('t in msec');
+ylabel('xa(t)');
+title('Sinal reconstruído de x1(n) usando a função sinc')
+
+
+%% Exercício 3.22 - Usando Sinc
+% Discrete-time Signal x2(n)
+
+Ts = 0.001;
+Fs = 1/Ts;
+n = -5:1:5;
+nTs = n*Ts;
+x = exp(-1000*abs(nTs));
+
+% Analog Signal reconstruction
+Dt = 0.00005;
+t = -0.005:Dt:0.005;
+xa = x * sinc(Fs*(ones(length(n),1)*t-nTs'*ones(1,length(t))));
+
+% check
+error = max(abs(xa - exp(-1000*abs(t))))
+
+%plot
+plot(nTs*1000,x);
+hold on;
+stem(n*Ts*1000,x, "filled");
+xlabel('t in msec');
+ylabel('xa(t)');
+title('Reconstrução do sinal x2(n) Usando Funcao ZOH')
+
+
+%%  Exercício 3.23 - usando ZOH e FOH
+% Discrete-time Signal x1(n) : Ts = 0.0002
+Ts = 0.0002;
+n = -25:1:25;
+nTs = n*Ts;
+x = exp(-1000*abs(nTs));
+% Plots
+subplot(2,1,1);
+stairs(nTs*1000,x);
+xlabel('t in msec.');
+ylabel('xa(t)')
+title('Reconstructed Signal from x1(n) using zero-order-hold');
+hold on
+stem(n*Ts*1000,x);
+hold off
+
+% Discrete-time Signal x2(n) : Ts = 0.001
+Ts = 0.001;
+n = -5:1:5;
+nTs = n*Ts;
+x = exp(-1000*abs(nTs));
+% Plots
+subplot(2,1,2);
+plot(nTs*1000,x);
+xlabel('t in msec.');
+ylabel('xa(t)')
+title('Reconstructed Signal from x2(n) using zero-order-hold');
+hold on
+stem(n*Ts*1000,x);
+hold off
+
+%% Spline
+% a) Discrete-time Signal x1(n): Ts = 0.0002
+Ts = 0.0002;
+n = -25:1:25;
+nTs = n*Ts;
+x = exp(-1000*abs(nTs));
+% Analog Signal reconstruction
+Dt = 0.00005;
+t = -0.005:Dt:0.005;
+xa = spline(nTs,x,t);
+% check
+error = max(abs(xa - exp(-1000*abs(t))))
+%plot
+plot(nTs*1000,x);
+hold on;
+stem(n*Ts*1000,x, "filled");
+xlabel('t in msec');
+ylabel('xa(t)');
+title('Reconstructed Signal from x1(n) using cubic spline function')
